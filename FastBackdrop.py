@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------------
 #  FastBackdrop
-#  Version: v01.0
+#  Version: v01.1
 #  Author: Danilo de Lucio
 #  Website: www.danilodelucio.com
 # -----------------------------------------------------------------------------------
@@ -16,6 +16,8 @@
 
 import nuke
 import os
+import random
+import colorsys
 from functools import partial
 
 try:
@@ -24,7 +26,7 @@ except ImportError:
     try:
         from PySide6 import QtWidgets, QtGui, QtCore
     except ImportError:
-        nuke.message("Error: Neither PySide2 nor PySide6 is available in this Nuke build.")
+        nuke.message("FastBackdrop: PySide2/PySide6 not available in this Nuke build.")
         raise
 
 
@@ -39,25 +41,85 @@ DEFAULT_COLOR = 0x1F252FFF
 
 DEFAULT_PADDING = 80
 TOP_EXTRA = 120
+# ----------------------------
 
+# Backdrop colors (real tile_color)
 COLOR_PRESETS = [
-    0x592929FF,
-    0x595929FF,
-    0x293959FF,
-    0x392959FF,
-    0x592949FF,
-    0x594929FF,
-    0x295959FF,
+    0x592929FF,  # reddish
+    0x295929FF,  # greenish
+    0x293959FF,  # blue-ish
+    0x392959FF,  # purple-ish
+    0x592949FF,  # magenta-ish
+    0x594929FF,  # warm brown-ish
+    0x295959FF,  # teal-ish
 ]
 
 
-# ==========================
-# BACKDROP LOGIC
-# ==========================
+def ui_preview_color(argb, lighten_factor=0.35, saturation_boost=1.35):
+    """Make UI preview colors lighter AND more saturated (without affecting real backdrop colors)."""
+
+    # Extract RGB
+    r = (argb >> 24) & 255
+    g = (argb >> 16) & 255
+    b = (argb >> 8) & 255
+
+    # Convert to HSV
+    h, s, v = colorsys.rgb_to_hsv(r/255.0, g/255.0, b/255.0)
+
+    # Boost saturation
+    s = min(1.0, s * saturation_boost)
+
+    # Lighten value
+    v = min(1.0, v + (1.0 - v) * lighten_factor)
+
+    # Back to RGB
+    r2, g2, b2 = colorsys.hsv_to_rgb(h, s, v)
+    r2 = int(r2 * 255)
+    g2 = int(g2 * 255)
+    b2 = int(b2 * 255)
+
+    return (r2 << 24) | (g2 << 16) | (b2 << 8) | 255
+
+
+COLOR_PRESETS_UI = [ui_preview_color(c) for c in COLOR_PRESETS]
+
+
+def random_pastel_color():
+    """Generate a random pastel ARGB color (same S/V, random H)."""
+    h = random.random()
+    s = 0.545
+    v = 0.35
+
+    r, g, b = colorsys.hsv_to_rgb(h, s, v)
+    r = int(r * 255)
+    g = int(g * 255)
+    b = int(b * 255)
+
+    return (r << 24) | (g << 16) | (b << 8) | 255
+
+
+def compute_z_order():
+    """Compute z_order so new backdrop goes behind selected backdrops."""
+    sel = nuke.selectedNodes()
+    z_values = []
+
+    for n in sel:
+        if n.Class() == "BackdropNode":
+            try:
+                z_values.append(int(n["z_order"].value()))
+            except:
+                pass
+
+    if z_values:
+        return min(z_values) - 1
+    else:
+        return -1
+
+
 def create_fast_backdrop(label, color):
     sel = nuke.selectedNodes()
     if not sel:
-        nuke.message("Select some nodes first.")
+        nuke.message("FastBackdrop: Please select some nodes first.")
         return
 
     if label.strip():
@@ -88,7 +150,8 @@ def create_fast_backdrop(label, color):
         note_font=font_style,
         note_font_size=DEFAULT_FONT_SIZE,
         note_font_color=0xFFFFFFFF,
-        label=label
+        label=label,
+        z_order=compute_z_order()
     )
 
     return bd
@@ -144,9 +207,10 @@ class FastBackdropPanel(QtWidgets.QDialog):
         super(FastBackdropPanel, self).__init__(parent)
 
         self.setWindowTitle("FastBackdrop")
-        self.setMinimumWidth(380)
+        self.setMinimumWidth(420)
         self.color = DEFAULT_COLOR
         self.preset_buttons = []
+        self.preset_selected = False  # para saber se o user escolheu preset
 
         main = QtWidgets.QVBoxLayout(self)
         row1 = QtWidgets.QHBoxLayout()
@@ -155,13 +219,16 @@ class FastBackdropPanel(QtWidgets.QDialog):
         self.label_edit = QtWidgets.QLineEdit()
         self.label_edit.setPlaceholderText("Custom Label")
         self.label_edit.setMinimumHeight(34)
+        self.label_edit.setMinimumWidth(200)
+        self.label_edit.setSizePolicy(QtWidgets.QSizePolicy.Expanding,
+                                      QtWidgets.QSizePolicy.Fixed)
         self.label_edit.setStyleSheet("QLineEdit { padding: 6px; font-size: 14px; }")
         row1.addWidget(self.label_edit)
 
-        # Presets
-        for preset in COLOR_PRESETS:
-            btn = ColorButton(preset, selectable=True)
-            btn.clicked.connect(partial(self.set_preset_color, preset, btn))
+        # Presets (UI colors, but mapped to real colors)
+        for ui_color, real_color in zip(COLOR_PRESETS_UI, COLOR_PRESETS):
+            btn = ColorButton(ui_color, selectable=True)
+            btn.clicked.connect(partial(self.set_preset_color, real_color, btn))
             self.preset_buttons.append(btn)
             row1.addWidget(btn)
 
@@ -171,7 +238,7 @@ class FastBackdropPanel(QtWidgets.QDialog):
         row1.addWidget(sep)
 
         # Pick Color button with external PNG
-        self.color_btn = ColorButton(self.color)
+        self.color_btn = ColorButton(ui_preview_color(self.color))
 
         icon_path = os.path.join(os.path.dirname(__file__), "img", "colorpicker_icon.png")
         if os.path.exists(icon_path):
@@ -192,9 +259,10 @@ class FastBackdropPanel(QtWidgets.QDialog):
 
         self.label_edit.returnPressed.connect(self.create_backdrop)
 
-    def set_preset_color(self, color, button):
-        self.color = color
-        self.color_btn.set_color(color)
+    def set_preset_color(self, real_color, button):
+        self.color = real_color
+        self.preset_selected = True
+        self.color_btn.set_color(ui_preview_color(self.color))
 
         for b in self.preset_buttons:
             b.set_selected(b is button)
@@ -203,19 +271,20 @@ class FastBackdropPanel(QtWidgets.QDialog):
         color = nuke.getColor()
         if color is not None:
             self.color = color
-            self.color_btn.set_color(color)
+            self.preset_selected = False
+            self.color_btn.set_color(ui_preview_color(self.color))
             for b in self.preset_buttons:
                 b.set_selected(False)
 
     def create_backdrop(self):
+        if not self.preset_selected and self.color == DEFAULT_COLOR:
+            self.color = random_pastel_color()
+            self.color_btn.set_color(ui_preview_color(self.color))
+
         label = self.label_edit.text()
         create_fast_backdrop(label, self.color)
         self.close()
 
-
-# ==========================
-# ENTRY POINT
-# ==========================
 FAST_BACKDROP_PANEL = None
 
 def show_fast_backdrop():
@@ -233,3 +302,4 @@ def show_fast_backdrop():
 
     FAST_BACKDROP_PANEL = FastBackdropPanel()
     FAST_BACKDROP_PANEL.show()
+
