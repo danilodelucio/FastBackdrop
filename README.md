@@ -15,11 +15,26 @@ In `FastBackdrop.py`, you can adjust default settings, such as font, font size, 
 
 <img width="518" height="427" alt="image" src="https://github.com/user-attachments/assets/cec05fbf-9466-465b-b202-f7646b317b53" />
 
-
-
 # ☢️ Nuke Compatibility
 - **FastBackdrop** was developed in **Nuke 12.1v5** and it's currently being tested with new versions, but it's designed to work between all Nuke versions.
 - It works for commercial and non-commercial versions (except Indie due to the Python limitation).
+
+# 📥 Download & Install
+- Download the latest release of FastBackdrop:
+
+👉 [Download FastBackdrop](https://github.com/danilodelucio/FastBackdrop/releases/download/v01.1/FastBackdrop_v01.1.zip)
+
+- Extract the **FastBackdrop** folder and place it inside your `.nuke` directory (usually located at `C:/Users/%USERNAME%/.nuke`).
+
+- Open (or create) the `init.py` file inside `.nuke` and add the following line:
+
+```
+nuke.pluginAddPath('./FastBackdrop')
+```
+
+- Launch Nuke and go to _Edit → FastBackdrop_ (or press `Alt` + `B`) to open the tool.
+
+Enjoy!
 
 # ☕ Support me!
 
