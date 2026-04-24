@@ -4,13 +4,15 @@
 # 🧩 Introduction
 **FastBackdrop** is a tool designed to quickly create Backdrops in Nuke.
 
-<img alt="intro_v001" src="https://github.com/user-attachments/assets/7fecd14a-963b-416a-bd46-fcb7d644939d" />
-
 # 🎯 Call it, name it, done.
-Press `Alt` + `B` to open **FastBackdrop**, type a custom label, hit Enter, and a Backdrop is created instantly with a random color.
+Press `Alt` + `B` to open **FastBackdrop**, type a custom label, hit `Enter`, and a Backdrop is created instantly with a random color.
+
+<img alt="intro_v001" src="https://github.com/user-attachments/assets/7fecd14a-963b-416a-bd46-fcb7d644939d" />
 
 # 🎨 Preset & custom colors
 Choose from color presets by clicking one of the color swatches, or pick any color you want using the color‑picker icon.
+
+<img alt="presets_v001" src="https://github.com/user-attachments/assets/551e4997-6b42-4b91-971f-8c8ae024ed09" />
 
 # ⚙️ Customize the default behavior
 In `FastBackdrop.py`, you can adjust default settings, such as font, font size, padding, and other stylistic preferences to match your needs.
