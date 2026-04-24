@@ -1,3 +1,5 @@
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/danilodelucio/FastBackdrop/total?style=for-the-badge)
+
 # FastBackdrop
 <img width="1222" height="515" alt="image" src="https://github.com/user-attachments/assets/d8d892b7-c270-45bd-a48a-de8fecbec672" />
 
@@ -9,7 +11,7 @@ Press `Alt` + `B` to open **FastBackdrop**, type a custom label, hit `Enter`, an
 
 <img alt="intro_v001" src="https://github.com/user-attachments/assets/7fecd14a-963b-416a-bd46-fcb7d644939d" />
 
-# 🎨 Preset & custom colors
+# 🎨 Presets & custom colors
 Choose from color presets by clicking one of the color swatches, or pick any color you want using the color‑picker icon.
 
 <img alt="presets_v001" src="https://github.com/user-attachments/assets/551e4997-6b42-4b91-971f-8c8ae024ed09" />
