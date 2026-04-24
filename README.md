@@ -4,6 +4,8 @@
 # 🧩 Introduction
 **FastBackdrop** is a tool designed to quickly create Backdrops in Nuke.
 
+<img alt="intro_v001" src="https://github.com/user-attachments/assets/7fecd14a-963b-416a-bd46-fcb7d644939d" />
+
 # 🎯 Call it, name it, done.
 Press `Alt` + `B` to open **FastBackdrop**, type a custom label, hit Enter, and a Backdrop is created instantly with a random color.
 
