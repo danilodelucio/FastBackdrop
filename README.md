@@ -1,7 +1,7 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/danilodelucio/FastBackdrop/total?style=for-the-badge)
 
 # FastBackdrop
-<img width="1222" height="515" alt="image" src="https://github.com/user-attachments/assets/d8d892b7-c270-45bd-a48a-de8fecbec672" />
+<img width="1222" height="515" alt="FastBackdrop Cover v1" src="https://github.com/user-attachments/assets/43e5c4ac-4bf4-4401-9477-530c6871d7a6" />
 
 # 🧩 Introduction
 **FastBackdrop** is a tool designed to quickly create Backdrops in Nuke.
